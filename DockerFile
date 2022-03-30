@@ -1,0 +1,4 @@
+FROM openjdk:8
+EXPOSE 8761
+COPY target/issuerservice-0.0.1-SNAPSHOT.jar issuerservice-0.0.1-SNAPSHOT.jar
+ENTRYPOINT ["java","-jar","/issuerservice-0.0.1-SNAPSHOT.jar"]
