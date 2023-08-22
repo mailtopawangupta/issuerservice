@@ -5,6 +5,7 @@ import com.amazingbooks.issuerservice.model.Book;
 import com.amazingbooks.issuerservice.repository.Issuer;
 import com.amazingbooks.issuerservice.repository.IssuerId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,21 +27,45 @@ public class IssuerService {
         Book book = null;
         switch (searchCritera){
             case "isbn":
-                book =  restTemplate.getForObject("http://book-service/amazingbooks/book/isbn/{criteria}",Book.class, Long.parseLong(value));
-                books.add(book);
+                books =  fetchBooksByIsbn(searchCritera,value);
                 break;
             case "title":
-                books = (List<Book>) restTemplate.getForObject("http://book-service/amazingbooks/books/title/{criteria}",List.class, value);
+                books = fetchBooksByTitle(searchCritera,value);
                 break;
             case "author":
-                books = (List<Book>) restTemplate.getForObject("http://book-service/amazingbooks/books/author/{criteria}",List.class, value);
+                books = fetchBooksByAuthor(searchCritera,value);
                 break;
         }
 
         return books;
     }
 
+    @Cacheable(key = "#isbn",value = "Book")
+    public List<Book> fetchBooksByIsbn(String isbn, String value){
+        List<Book> books = new ArrayList<>();
+        Book book = null;
+        book =  restTemplate.getForObject("http://book-service/amazingbooks/book/isbn/{isbn}",Book.class, Long.parseLong(value));
+        books.add(book);
+        return books;
+    }
 
+    @Cacheable(key = "#title",value = "Book")
+    public List<Book> fetchBooksByTitle(String title, String value){
+        List<Book> books = new ArrayList<>();
+        books = (List<Book>) restTemplate.getForObject("http://book-service/amazingbooks/books/title/{title}",List.class, value);
+        return books;
+    }
+
+    @Cacheable(key = "#author",value = "Book")
+    public List<Book> fetchBooksByAuthor(String author, String value){
+        List<Book> books = new ArrayList<>();
+        Book book = null;
+        books = (List<Book>) restTemplate.getForObject("http://book-service/amazingbooks/books/author/{author}",List.class, value);
+        books.add(book);
+        return books;
+    }
+
+    @Cacheable(value = "Book")
     public List<Book> fetchAllBooks(){
         List<Book> books = new ArrayList<>();
         books = restTemplate.getForObject("http://book-service/amazingbooks/books",List.class);

@@ -4,6 +4,7 @@ import com.amazingbooks.issuerservice.model.Book;
 import com.amazingbooks.issuerservice.repository.Issuer;
 import com.amazingbooks.issuerservice.service.IssuerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/amazingbooks")
+@EnableCaching
 public class IssuerController {
 
     @Autowired
